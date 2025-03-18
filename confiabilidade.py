@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt  # Biblioteca para gerar gráficos
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # Permite integrar gráficos matplotlib no Tkinter
 import tkinter as tk  # Biblioteca padrão para criar interfaces gráficas em Python
 from tkinter import filedialog, messagebox  # Módulos para diálogos de arquivos e mensagens de erro/sucesso
+import csv  # Biblioteca para trabalhar com arquivos CSV
 
 # Função para calcular a confiabilidade
 def calcular_confiabilidade(t, mtbf):
@@ -31,10 +32,15 @@ def calcular_e_mostrar():
     try:
         mtbf = float(entry_mtbf.get())
         t = float(entry_tempo.get())
+
+        if mtbf <= 0 or t < 0:
+            messagebox.showerror("Erro", "MTBF deve ser maior que zero e Tempo não pode ser negativo!")
+            return
+
         confiabilidade = calcular_confiabilidade(t, mtbf)
         confiabilidade_percentual = confiabilidade * 100  # Converte para porcentagem
         resultado_var.set(f"Confiabilidade no tempo {t} (em horas): {confiabilidade_percentual:.2f}%")
-        
+
         # Atualizar gráfico
         fig = gerar_grafico(mtbf)
         for widget in frame_grafico.winfo_children():
@@ -54,6 +60,25 @@ def salvar_resultados():
             file.write(resultado_var.get())
         messagebox.showinfo("Sucesso", "Resultados salvos com sucesso!")
 
+# Função para salvar os resultados em formato CSV
+def salvar_resultados_csv():
+    file_path = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV Files", "*.csv")])
+    if file_path:
+        try:
+            mtbf = float(entry_mtbf.get())
+            t = float(entry_tempo.get())
+            confiabilidade = calcular_confiabilidade(t, mtbf)
+            confiabilidade_percentual = confiabilidade * 100  # Converte para porcentagem
+
+            with open(file_path, mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(["Tempo (h)", "MTBF (h)", "Confiabilidade (%)"])
+                writer.writerow([t, mtbf, confiabilidade_percentual])
+                
+            messagebox.showinfo("Sucesso", "Resultados salvos em CSV com sucesso!")
+        except ValueError:
+            messagebox.showerror("Erro", "Digite valores numéricos válidos!")
+
 # Função para salvar o gráfico gerado como imagem
 def salvar_grafico():
     file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG Files", "*.png")])
@@ -61,6 +86,14 @@ def salvar_grafico():
         fig = gerar_grafico(float(entry_mtbf.get()))
         fig.savefig(file_path)
         messagebox.showinfo("Sucesso", "Gráfico salvo com sucesso!")
+
+# Função para limpar os valores da interface
+def limpar_valores():
+    entry_mtbf.delete(0, tk.END)
+    entry_tempo.delete(0, tk.END)
+    resultado_var.set("")
+    for widget in frame_grafico.winfo_children():
+        widget.destroy()
 
 # Configuração da interface gráfica
 root = tk.Tk()
@@ -111,8 +144,15 @@ frame_botoes.pack(pady=10)
 btn_salvar_txt = tk.Button(frame_botoes, text="Salvar Resultado", command=salvar_resultados, bg="#5A189A", fg="white", font=("Arial", 12), relief="flat")
 btn_salvar_txt.pack(side="left", padx=10)
 
+btn_salvar_csv = tk.Button(frame_botoes, text="Salvar em CSV", command=salvar_resultados_csv, bg="#5A189A", fg="white", font=("Arial", 12), relief="flat")
+btn_salvar_csv.pack(side="left", padx=10)
+
 btn_salvar_grafico = tk.Button(frame_botoes, text="Salvar Gráfico", command=salvar_grafico, bg="#5A189A", fg="white", font=("Arial", 12), relief="flat")
 btn_salvar_grafico.pack(side="left", padx=10)
+
+# Botão para limpar os valores
+btn_limpar = tk.Button(frame_botoes, text="Limpar Valores", command=limpar_valores, bg="#FF4C4C", fg="white", font=("Arial", 12), relief="flat")
+btn_limpar.pack(side="left", padx=10)
 
 # Inicia o loop principal do Tkinter
 root.mainloop()
