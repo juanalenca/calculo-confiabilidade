@@ -141,10 +141,10 @@ label_resultado.pack(pady=10)
 frame_botoes = tk.Frame(frame_main, bg="#1E1E1E")
 frame_botoes.pack(pady=10)
 
-btn_salvar_txt = tk.Button(frame_botoes, text="Salvar Resultado", command=salvar_resultados, bg="#5A189A", fg="white", font=("Arial", 12), relief="flat")
+btn_salvar_txt = tk.Button(frame_botoes, text="Salvar em txt", command=salvar_resultados, bg="#5A189A", fg="white", font=("Arial", 12), relief="flat")
 btn_salvar_txt.pack(side="left", padx=10)
 
-btn_salvar_csv = tk.Button(frame_botoes, text="Salvar em CSV", command=salvar_resultados_csv, bg="#5A189A", fg="white", font=("Arial", 12), relief="flat")
+btn_salvar_csv = tk.Button(frame_botoes, text="Salvar em csv", command=salvar_resultados_csv, bg="#5A189A", fg="white", font=("Arial", 12), relief="flat")
 btn_salvar_csv.pack(side="left", padx=10)
 
 btn_salvar_grafico = tk.Button(frame_botoes, text="Salvar Gráfico", command=salvar_grafico, bg="#5A189A", fg="white", font=("Arial", 12), relief="flat")
